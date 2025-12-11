@@ -1,0 +1,30 @@
+## Touch + Hybrid Pose Control + RViz 可视化：完整启动流程(4个窗口) ##
+
+终端 1：启动 Touch 驱动（必须先启）
+cd ~/touch_ros2_ws
+colcon build
+source install/setup.bash
+ros2 launch omni_common omni_state.launch.py
+
+终端 2：启动你的混合控制节点（增量位置 + 姿态绝对）
+cd ~/touch_ros2_ws
+colcon build
+source install/setup.bash
+ros2 run omni_control touch_hybrid_pose_control
+
+终端 3：启动可视化节点（发布 Marker 球体）
+cd ~/touch_ros2_ws
+source install/setup.bash
+ros2 run omni_control touch_control_visualizer
+
+终端 4（可选）：打开rviz显示界面
+rviz2
+更改 Fixed Frame 为 world
+选中 Add -> By topic -> /touch_control/marker/Marker，点击 OK
+点击 Touch 灰色按键，即可看到 rviz 中出现红点，即 Touch 末端。
+
+注意：重新执行程序可仅退出 touch_hybrid_pose_control 节点，omni_state.launch.py 节点非必要不退出，退出则大概率需要电脑重启：sudo reboot
+
+
+
+## 钛虎机械臂：Ti5 EBLM/ARM系列

@@ -1,0 +1,85 @@
+官方驱动下载连接：https://support.3dsystems.com/s/article/OpenHaptics-for-Linux-Developer-Edition-v34?language=en_US
+依次下载安装 OpenHaptics Installer 以及 Haptic device driver Installer
+
+附：
+解压安装 OpenHaptics：
+cd ~/下载
+tar -xvf openhaptics_3.4-0-developer-edition-amd64.tar.gz
+cd openhaptics_3.4-0-developer-edition-amd64
+
+sudo ./install
+
+
+
+************最后安装Haptic device driver的步骤***************
+下载并解压 Touch Device Driver：
+cd ~/下载
+tar -xvf TouchDriver_2024_09_19.tgz
+cd TouchDriver_2024_09_19
+
+运行 Touch Device Driver 安装脚本：
+sudo ./install_haptic_driver
+
+
+# 1. 尝试加载 phantom 内核模块
+sudo modprobe phantom
+
+
+# 确保两个设备节点都有读写权限
+sudo chmod a+rw /dev/ttyACM0 /dev/ttyACM300
+# 再次尝试运行TouchCheckup
+TouchCheckup
+
+
+# 1. 首先，备份系统原有的库（安全起见）
+sudo mv /lib/libPhantomIOLib42.so /lib/libPhantomIOLib42.so.backup
+
+# 2. 将新驱动包中的库复制到系统库目录
+# 先确认新驱动包内库文件的确切路径
+find ~/下载/TouchDriver_2024_09_19 -name "libPhantomIOLib42.so"
+# 假设找到的路径是 ~/下载/TouchDriver_2024_09_19/usr/lib/libPhantomIOLib42.so
+sudo cp ~/下载/TouchDriver_2024_09_19/usr/lib/libPhantomIOLib42.so /lib/
+
+# 3. 更新动态链接库缓存
+sudo ldconfig
+
+# 4. 再次运行TouchCheckup（先普通用户，再sudo）
+TouchCheckup
+
+
+cd ~/touch_ros2_ws
+source install/setup.bash
+ros2 run omni_common omni --ros-args -p device:=/dev/ttyACM0
+************最后安装Haptic device driver的步骤***************
+
+
+
+注：这两个之间的次序好像不是那么重要，我一开始安装 OpenHaptics Installer 感觉没什么问题就紧接着安装了Haptic device driver Installer， 最后测试感觉一直不对，等到了第二天早上又重新安装了几次 OpenHaptics Installer。当时测试一直感觉是电脑读取的端口与实际端口不匹配，但一直每解决，回过头看的话，那会儿可能就是可以的了。
+
+
+
+
+之后可以执行以下几个步骤进行测试。
+
+lsusb：确认硬件连接正常
+
+ls /dev/tty*：确认存在端口 /dev/ttyACM0
+
+sudo chmod 777 /dev/ttyACM0：修改端口权限
+
+TouchCheckup：打开显示界面
+
+另外，部署了仓库：https://github.com/tstoyanov/Geomagic_Touch_ROS2?tab=readme-ov-file
+
+注：按说只要TouchCheckup能够顺利打开显示界面，运行仓库指令
+ros2 launch omni_common omni_state.launch.py
+应该就是没问题的。
+
+ROS2编译空间: colcon build
+source install/setup.bash
+
+查看话题：ros2 topic list
+订阅话题并查看数据：ros2 topic echo /phantom/pose
+
+
+***注意：好像每次安装都需要首先在~/下载/TouchDriver_2024_09_19/bin$ 路径下执行 ./Touch_AdvancedConfig，这里确保通信无误后再执行TouchCheckup

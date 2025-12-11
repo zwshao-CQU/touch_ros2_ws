@@ -1,0 +1,6 @@
+build/
+install/
+log/
+.colcon_install_layout
+*.pyc
+__pycache__/
