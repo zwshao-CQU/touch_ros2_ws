@@ -28,7 +28,7 @@ class TouchHybridPoseControl(Node):
         self.ee_target_pos = np.zeros(3)
 
         # 位置缩放系数
-        self.position_scale = 0.1
+        self.position_scale = 0.1*0.1*0.2
 
         # ☆☆ 新增：整体限幅（避免 RViz 边界导致越界挂掉） ☆☆
         self.max_range = 2.0   # ±20 cm，足够大，也非常安全

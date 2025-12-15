@@ -1,0 +1,69 @@
+✅ Step 1：启动 Touch 驱动节点（Terminal 1）
+source ~/touch_ros2_ws/install/setup.bash
+ros2 launch omni_common omni_state.launch.py
+
+
+你必须看到类似输出：
+
+Found Touch.
+Calibration is already OK
+Publishing PHaNTOM state at [1000] Hz
+listening to: phantom/force_feedback
+
+
+❗ 如果这里报错，后面全部不用跑
+
+✅ Step 2：启动 Touch 控制节点（Terminal 2）
+source ~/touch_ros2_ws/install/setup.bash
+ros2 run omni_control touch_hybrid_pose_control
+
+
+看到：
+
+Hybrid Touch Control node started.
+Hold GREY button to control (clutch mode).
+
+
+此时可以测试按钮：
+
+ros2 topic echo /phantom/button
+
+
+确认灰键 / 白键能变化。
+
+✅ Step 3：启动虚拟环境（Terminal 3）
+source ~/touch_ros2_ws/install/setup.bash
+ros2 launch virtual_environment virtual_wall.launch.py
+
+
+你应该看到：
+
+/virtual_env/wall_marker
+
+/virtual_env/contact_point
+
+✅ Step 4：启动力反馈节点 + RViz（Terminal 4）
+4.1 力反馈节点
+source ~/touch_ros2_ws/install/setup.bash
+ros2 run virtual_environment force_feedback_node
+
+
+看到：
+
+Force Feedback Node (Wall + Field) started.
+
+4.2 RViz（同一终端或新终端）
+rviz2
+
+
+RViz 设置：
+
+Fixed Frame：world
+
+Add → Marker：
+
+/virtual_env/wall_marker
+
+/virtual_env/contact_point
+
+/virtual_env/force_vector
